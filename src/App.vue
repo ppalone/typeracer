@@ -14,13 +14,15 @@
     </div>
 
     <!-- TEXT -->
-    <div id="text">
-      <template v-for="(t, i) in text">
-        <span
-          :class="{'active': i===current, 'correct': t.answer && t.word===t.answer, 'wrong': t.answer && t.word!==t.answer }">{{
-          t.word
-          }}</span>
-      </template>
+    <div id="text-wrapper">
+      <div id="text">
+        <template v-for="(t, i) in text">
+          <span
+            :class="{'active': i===current, 'correct': t.answer && t.word===t.answer, 'wrong': t.answer && t.word!==t.answer }">{{
+            t.word
+            }}</span>
+        </template>
+      </div>
     </div>
 
     <!-- input -->
@@ -35,6 +37,9 @@
 import { ref, onMounted, onBeforeUnmount, reactive, computed } from "vue"
 
 const SPACE = "Space"
+const BLANK_SPACE = " "
+const SPACE_KEYCODE = 32
+
 const BACKSPACE = "Backspace"
 
 const TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
@@ -79,7 +84,10 @@ const wpm = computed(() => {
 })
 
 const input = (e) => {
-  if (e.code === SPACE) {
+
+  console.log(e)
+  const KEYCODE = e.which || e.keyCode
+  if (e.code === SPACE || e.key === BLANK_SPACE || KEYCODE === SPACE_KEYCODE) {
     e.preventDefault()
 
     // don't allow empty word
@@ -97,10 +105,12 @@ const input = (e) => {
     }
 
     current.value += 1
+    const active = document.querySelector(".active")
+    active.scrollIntoView({ behavior: "smooth" })
     return
   }
 
-  if (e.code === BACKSPACE) return
+  if (e.key === BACKSPACE) return
 
   const ALPHA = /[a-zA-Z]/g
 
@@ -122,6 +132,11 @@ const input = (e) => {
   align-items: center;
   width: 80%;
   margin: 0 auto;
+  padding: 0.5rem 0;
+}
+
+#text-wrapper {
+  overflow-y: scroll;
 }
 
 #text {
@@ -137,6 +152,9 @@ const input = (e) => {
 span {
   color: rgb(125, 125, 125);
   padding: 0.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   user-select: none;
 }
 
@@ -162,7 +180,7 @@ h1 {
 }
 
 #word {
-  height: 40px;
+  height: 60px;
 }
 
 .correct {
@@ -182,5 +200,17 @@ h1 {
 #info>div {
   padding: 0.25rem;
   border: 1px dashed gray;
+}
+
+@media (max-width: 768px) {
+
+  #root {
+    width: 95%;
+  }
+
+  #text,
+  input {
+    font-size: 1.1rem;
+  }
 }
 </style>
