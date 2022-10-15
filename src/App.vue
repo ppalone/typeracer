@@ -25,7 +25,7 @@
 
     <!-- input -->
     <div id="input">
-      <input type="text" @keydown="input" v-model="word" ref="template">
+      <input type="text" @keydown="input" v-model="word" ref="template" @paste.prevent @copy.prevent @cut.prevent>
     </div>
 
   </div>
@@ -39,7 +39,7 @@ const BACKSPACE = "Backspace"
 
 const TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
-const TEXT_HACKED = TEXT.split(" ").map(t => t.toLowerCase().replace(/[,.]/g, "")).sort(() => Math.random() > 0.5 ? 1 : -1)
+const TEXT_HACKED = TEXT.split(" ").map(t => t.toLowerCase().replace(/[,.]/g, "").split("").sort(() => Math.random() > 0.5 ? 1 : -1).join("")).sort(() => Math.random() > 0.5 ? 1 : -1)
 
 const text = reactive(TEXT_HACKED.map(w => {
   return {
@@ -75,7 +75,7 @@ const timer = computed(() => {
 
 const wpm = computed(() => {
   if (counter.value === 0) return 0
-  return parseInt((text.filter(w => w.answer).length * (60 / (counter.value))), 10)
+  return parseInt((text.filter(w => w.answer && w.answer === w.word).length * (60 / (counter.value))), 10)
 })
 
 const input = (e) => {
@@ -137,6 +137,7 @@ const input = (e) => {
 span {
   color: rgb(125, 125, 125);
   padding: 0.25rem;
+  user-select: none;
 }
 
 .active {
